@@ -2,9 +2,10 @@ import axios from "axios";
 import React, { useState, useEffect } from "react";
 import { Downarrow } from "../assets/index";
 import { useDispatch } from "react-redux";
-import { Link } from "react-router-dom";
-import { addQuestions } from "../redux/actions";
+import { useNavigate } from "react-router-dom";
+import { addQuestions, addToken } from "../redux/actions";
 import Header from "./Header";
+import { useSelector } from "react-redux/es/exports";
 
 const levelData = [
   { id: "1", level: "easy" },
@@ -20,6 +21,9 @@ const QSelection = () => {
   const [categoryId, setCategoryId] = useState("");
   const [categoryName, setCategoryName] = useState([]);
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const { token } = useSelector((state) => state.questionSet);
+  console.log(token);
 
   const categoryURL = "https://opentdb.com/api_category.php";
 
@@ -28,29 +32,51 @@ const QSelection = () => {
     setCategoryName(name);
     setCategoryOpen(false);
   };
-  const handleLevel = (category) => {
-    setLevel(category);
-    setLevelOpen(false);
-  };
-  const handleClick = () => {
-    const data = {
-      categoryId,
-      level,
-    };
-    dispatch(addQuestions(data));
-  };
 
   useEffect(() => {
     axios.get(categoryURL).then((res) => {
       setCategoryList(res.data.trivia_categories);
     });
   }, []);
+
+  const handleLevel = (category) => {
+    setLevel(category);
+    setLevelOpen(false);
+  };
+
+  const handleClick = async () => {
+    if (categoryId && level) {
+      navigate("/questions");
+      document.getElementById("error").innerHTML = "";
+      const data = {
+        categoryId,
+        level,
+      };
+      dispatch(addQuestions(data));
+
+      if (!token) {
+        const tokenData = await axios(
+          "https://opentdb.com/api_token.php?command=request"
+        );
+        dispatch(addToken(tokenData.data.token));
+        console.log("token not exist creating new", tokenData.data.token);
+      } else {
+        console.log("token exist, not creating new");
+      }
+    } else {
+      document.getElementById("error").innerHTML =
+        "Please select the given fields";
+    }
+  };
+
+  // console.log(categoryList);
   return (
     <div className="container">
       <Header />
       <div className=" m-auto flex flex-col justify-center items-center px-10">
         <h1 className="text-[4rem] font-bold mt-20">Trivia Game</h1>
-        <div className="font-medium flex flex-col justify-center items-center mt-10">
+        <div className="error h-5" id="error"></div>
+        <div className="font-medium flex flex-col justify-center items-center mt-4">
           <div
             className="category_dropdown flex cursor-pointer"
             onClick={() => setCategoryOpen(!categoryOpen)}
@@ -106,7 +132,7 @@ const QSelection = () => {
             onClick={() => handleClick()}
             className="bg-[#108CFE] hover:bg-[#1A76E3] rounded-3xl py-3 text-[1.1rem] text-white w-48 my-10"
           >
-            <Link to="/questions">Get Started</Link>
+            Get Started
           </button>
         </div>
       </div>

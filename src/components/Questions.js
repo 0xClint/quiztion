@@ -6,32 +6,29 @@ import axios from "axios";
 import { addScore } from "../redux/actions";
 import Header from "./Header";
 import Loader from "../assets/icons/loader.gif";
+import { decode } from "html-entities";
 
 const Questions = () => {
   const [questions, setQuestions] = useState([]);
   const [loader, setLoader] = useState(true);
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  let questionList = [],
-    score = 0;
+  let questionList = [];
 
-  const { questionSet } = useSelector((state) => state.questionSet);
-  //   console.log(questionSet);
-  console.log(questionSet[0].categoryId, questionSet[0].level);
+  const { questionSet, token } = useSelector((state) => state.questionSet);
+  let { score } = useSelector((state) => state.questionSet);
+  // console.log(questionSet[0].categoryId, questionSet[0].level);
 
-  const questionURL = `https://opentdb.com/api.php?amount=5&category=${questionSet[0].categoryId}&difficulty=${questionSet[0].level}&type=multiple`;
-  console.log(questionURL);
+  const questionURL = `https://opentdb.com/api.php?amount=5&category=${questionSet[0].categoryId}&difficulty=${questionSet[0].level}&type=multiple&token=${token}`;
   useEffect(() => {
     axios.get(questionURL).then((response) => {
       setTimeout(() => {
         setQuestions(response.data.results);
         setLoader(false);
       }, 1000);
-
-      console.log(response.data, response.data.results);
     });
   }, []);
-  // console.log(questions, questions[1]);
+  console.log(questionURL);
   let i = 1;
   questions.map((items) => {
     let options = items.incorrect_answers;
@@ -88,7 +85,7 @@ const Questions = () => {
     <>
       {loader ? (
         <div className="loader_container flex justify-center items-center h-[100vh]">
-          <img src={Loader} alt="" srcset="" className="h-20" />
+          <img src={Loader} alt="" srcSet="" className="h-20" />
         </div>
       ) : (
         <>
@@ -105,7 +102,7 @@ const Questions = () => {
                     Question {item.id} / 5
                   </label>
                   <h1 className="text-[1.5rem] font-bold text-center mx-28 my-5">
-                    {item.question}
+                    {decode(item.question)}
                   </h1>
                   <div className="option_container my-5">
                     <p
@@ -113,28 +110,28 @@ const Questions = () => {
                       className=" opt rounded-2xl bg-[#F2F2F2] hover:bg-[#E8E8E8] w-[40vw] cursor-pointer focus:outline-none px-5 py-2.5 shadow-sm text-[#626384] my-6"
                       onClick={() => handleClick(item.id, item.options[0])}
                     >
-                      {item.options[0]}
+                      {decode(item.options[0])}
                     </p>
                     <p
                       id={item.options[1]}
                       className="rounded-2xl  bg-[#F2F2F2] hover:bg-[#E8E8E8] w-[40vw] cursor-pointer focus:outline-none px-5 py-2.5 shadow-sm text-[#626384] my-6"
                       onClick={() => handleClick(item.id, item.options[1])}
                     >
-                      {item.options[1]}
+                      {decode(item.options[1])}
                     </p>
                     <p
                       id={item.options[2]}
                       className="rounded-2xl bg-[#F2F2F2] hover:bg-[#E8E8E8] w-[40vw] cursor-pointer focus:outline-none px-5 py-2.5 shadow-sm text-[#626384] my-6"
                       onClick={() => handleClick(item.id, item.options[2])}
                     >
-                      {item.options[2]}
+                      {decode(item.options[2])}
                     </p>
                     <p
                       id={item.options[3]}
                       className="rounded-2xl bg-[#F2F2F2] hover:bg-[#E8E8E8] w-[40vw] cursor-pointer focus:outline-none px-5 py-2.5 shadow-sm text-[#626384] my-6"
                       onClick={() => handleClick(item.id, item.options[3])}
                     >
-                      {item.options[3]}
+                      {decode(item.options[3])}
                     </p>
                   </div>
                 </div>

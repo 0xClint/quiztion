@@ -1,7 +1,6 @@
-import { ADD_QUESTIONS, ADD_SCORE } from "./action-types";
+import { ADD_QUESTIONS, ADD_SCORE, ADD_TOKEN } from "./action-types";
 
 export const addQuestions = (data) => {
-  console.log(data);
   return {
     type: ADD_QUESTIONS,
     data,
@@ -9,9 +8,15 @@ export const addQuestions = (data) => {
 };
 
 export const addScore = (score) => {
-  console.log(score);
   return {
     type: ADD_SCORE,
     score,
+  };
+};
+
+export const addToken = (token) => {
+  return {
+    type: ADD_TOKEN,
+    token,
   };
 };
